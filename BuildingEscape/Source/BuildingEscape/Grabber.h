@@ -27,6 +27,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void ReachingActorToGrab(FVector &PlayerViewPointLocation, FRotator &PlayerViewPointRotation);
+
 private:
 	uint32 Reach = 100;
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
@@ -34,7 +36,9 @@ private:
 	UInputComponent* InputComponent = nullptr;
 
 	void Grab();
-
 	void Release();
+	void FindPhysicsHandleComponent();
+	void SetupInputComponent();
+	const FHitResult GetFirstPhysicsBodyInReach();
 
 };
