@@ -1,3 +1,4 @@
+
 #include "Grabber.h"
 #include "Gameframework/Actor.h" 
 
@@ -5,43 +6,23 @@
 
 UGrabber::UGrabber()
 {
-	//bWantsBeginPlay = true;
+	//bWantsBeginPlay = true; // w nowszych wersjach unreala nie trzeba tej linijki pisac
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
-	FindPhysicsHandleComponent();
-	SetupInputComponent();
+	FindPhysicsHandleComponent(); //bez tego crashuje, wyszukuje potrzebny komponent
+	SetupInputComponent(); //co sie dzieje jak nacisniemy klawisz
 }
 
-
-// Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FVector PlayerViewPointLocation;
-	FRotator PlayerViewPointRotation;
-
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
-		OUT PlayerViewPointLocation,
-		OUT PlayerViewPointRotation);
-
-	//UE_LOG(LogTemp, Warning, TEXT("Player pos : %s,  player rotation:  %s "), *PlayerViewPointLocation.ToString(), *PlayerViewPointRotation.ToString());
-
-	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
-
-
-	if (PhysicsHandle->GrabbedComponent)
-	{
-		PhysicsHandle->SetTargetLocation(LineTraceEnd);
-	}
-	else {
-		
-	}
-
+	if (PhysicsHandle->GrabbedComponent) //jesli cos zlapalismy to to przenosimy
+			PhysicsHandle->SetTargetLocation(GetLineTraceEnd());
 }
 
 const FHitResult UGrabber::GetFirstPhysicsBodyInReach() {
@@ -57,7 +38,7 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach() {
 
 	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 	DrawDebugLine(
-		GetWorld(), PlayerViewPointLocation, LineTraceEnd,
+		GetWorld(), GetLineTraceStart(), GetLineTraceEnd(),
 		FColor(0, 250, 50), false, 0.f, 0.f, 3.f
 	);
 
@@ -91,8 +72,8 @@ void UGrabber::Grab()
 	if (ActorHit)
 	{
 		PhysicsHandle->GrabComponent(
-			ComponentToGrab,
-			NAME_None,
+			ComponentToGrab, //co lapie
+			NAME_None, //nie mamy szkieletu
 			ComponentToGrab->GetOwner()->GetActorLocation(),
 			true //allow rotation
 		);
@@ -136,3 +117,32 @@ void UGrabber::SetupInputComponent() //ustawiamy co sie ma dziac jak nacisniemy/
 	}
 }
 
+FVector UGrabber::GetLineTraceEnd() {
+
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Player pos : %s,  player rotation:  %s "), *PlayerViewPointLocation.ToString(), *PlayerViewPointRotation.ToString());
+
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+	return LineTraceEnd;
+}
+
+FVector UGrabber::GetLineTraceStart() {
+
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation,
+		OUT PlayerViewPointRotation);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Player pos : %s,  player rotation:  %s "), *PlayerViewPointLocation.ToString(), *PlayerViewPointRotation.ToString());
+
+	FVector LineTraceEnd = PlayerViewPointLocation;
+	return LineTraceEnd;
+}

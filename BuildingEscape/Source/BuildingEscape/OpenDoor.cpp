@@ -1,8 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "OpenDoor.h"
 #include "Gameframework/Actor.h" 
-#include "BuildingEscape.h"
 
 
 // Sets default values for this component's properties
@@ -12,7 +10,6 @@ UOpenDoor::UOpenDoor()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
 }
 
 
@@ -20,15 +17,12 @@ UOpenDoor::UOpenDoor()
 void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ActorThatOpens = GetWorld() -> GetFirstPlayerController()->GetPawn(); // returns our character
+	//ActorThatOpens = GetWorld() -> GetFirstPlayerController()->GetPawn(); // returns our character ONLY
 	Owner = GetOwner();
 }
 
 void UOpenDoor::OpenDoor()
 {
-	
-
 	FRotator rotation = Owner->GetActorRotation();
 	rotation.Yaw = OpenAngle;
 	Owner->SetActorRotation(rotation);
@@ -47,7 +41,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (PressurePlate->IsOverlappingActor(ActorThatOpens))
+	if (GetTotalMassOfActorsOnPlate() > 0.f) //PressurePlate->IsOverlappingActor(ActorThatOpens) poprzednie sprawdzenie
 	{
 		OpenDoor();
 		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
@@ -58,3 +52,17 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	}
 }
 
+float UOpenDoor::GetTotalMassOfActorsOnPlate() {
+
+	float TotalMass = 0.f;
+
+	TArray<AActor*> OverlappingActors;
+	PressurePlate->GetOverlappingActors(OUT OverlappingActors); // krzesla nie dzialaly, bo we wlasciwosciach nie dodalam im generate overlap events
+
+	for (const auto* Actor : OverlappingActors) {
+
+		TotalMass+=Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+	}
+	return TotalMass;
+
+}
