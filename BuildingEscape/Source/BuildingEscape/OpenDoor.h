@@ -6,6 +6,8 @@
 #include "BuildingEscape.h"
 #include "OpenDoor.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest); //makro do eventow
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UOpenDoor : public UActorComponent
 {
@@ -41,6 +43,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		float DoorCloseDelay = 1.f;
+
+	UPROPERTY(BlueprintAssignable)
+		FOnOpenRequest OnOpenRequest;
 
 	float GetTotalMassOfActorsOnPlate();
 };
