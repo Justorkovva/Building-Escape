@@ -19,6 +19,9 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 	//ActorThatOpens = GetWorld() -> GetFirstPlayerController()->GetPawn(); // returns our character ONLY
 	Owner = GetOwner();
+	if (!PressurePlate) {
+		UE_LOG(LogTemp, Error, TEXT("%s - No pressure plate"),*GetOwner()->GetName());
+	}
 }
 
 void UOpenDoor::OpenDoor()
@@ -57,6 +60,7 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate() {
 	float TotalMass = 0.f;
 
 	TArray<AActor*> OverlappingActors;
+	if (!PressurePlate) { return TotalMass; }
 	PressurePlate->GetOverlappingActors(OUT OverlappingActors); // krzesla nie dzialaly, bo we wlasciwosciach nie dodalam im generate overlap events
 
 	for (const auto* Actor : OverlappingActors) {

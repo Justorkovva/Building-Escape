@@ -33,11 +33,11 @@ private:
 
 
 	float LastDoorOpenTime;
-	AActor* Owner;
+	AActor* Owner=nullptr;
 
 public:
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+	ATriggerVolume* PressurePlate=nullptr; // dodac w unrealu jaki trigger bedzie do tego przypisany, bo wyskoczy straszny blad i  w ogole
 
 	UPROPERTY(EditAnywhere)
 		float DoorCloseDelay = 1.f;

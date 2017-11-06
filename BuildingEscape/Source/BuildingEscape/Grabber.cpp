@@ -21,6 +21,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!PhysicsHandle) { return; } // zeby nie wchodzilo dalej, w przypadku gdy nie ma physicshandle gdzies dolaczonego
+
 	if (PhysicsHandle->GrabbedComponent) //jesli cos zlapalismy to to przenosimy
 			PhysicsHandle->SetTargetLocation(GetLineTraceEnd());
 }
@@ -71,6 +73,7 @@ void UGrabber::Grab()
 
 	if (ActorHit)
 	{
+		if (!PhysicsHandle) { return; }
 		PhysicsHandle->GrabComponent(
 			ComponentToGrab, //co lapie
 			NAME_None, //nie mamy szkieletu
@@ -83,17 +86,14 @@ void UGrabber::Grab()
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Grab Released"));
+	if (!PhysicsHandle) { return; }
 	PhysicsHandle->ReleaseComponent();
 }
 
 void UGrabber::FindPhysicsHandleComponent() {
 
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (PhysicsHandle)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Yey, physics handle component works"));
-	}
-	else
+	if (PhysicsHandle==nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("No physics handle component found"));
 	}
