@@ -6,7 +6,7 @@
 #include "BuildingEscape.h"
 #include "OpenDoor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOpenRequest); //makro do eventow
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDoorEvent); //makro do eventow, nasza nazwa w srodku dowolna
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BUILDINGESCAPE_API UOpenDoor : public UActorComponent
@@ -14,38 +14,27 @@ class BUILDINGESCAPE_API UOpenDoor : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UOpenDoor();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-	void OpenDoor();
-	void CloseDoor();
-
-public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+protected:
+	virtual void BeginPlay() override;
 
-private:
-	UPROPERTY(VisibleAnywhere)
-	float OpenAngle = 80.0f;
-
-
-	float LastDoorOpenTime;
 	AActor* Owner=nullptr;
+	float TriggerMass;
 
 public:
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate=nullptr; // dodac w unrealu jaki trigger bedzie do tego przypisany, bo wyskoczy straszny blad i  w ogole
 
 	UPROPERTY(EditAnywhere)
-		float DoorCloseDelay = 1.f;
+	float DoorCloseDelay = 1.f;
 
 	UPROPERTY(BlueprintAssignable)
-		FOnOpenRequest OnOpenRequest;
+		FDoorEvent OnOpen;
+
+	UPROPERTY(BlueprintAssignable) //zeby je dodac w unrealu potrzebujemy skompilowac kod, a potem w components (po wejsciu w BP) klikn¹æ na klasê w tym przypadku open door. dopiero wtedy jesteœmy w stanie dodac te eventy
+		FDoorEvent OnClose;
 
 	float GetTotalMassOfActorsOnPlate();
 };
